@@ -103,7 +103,13 @@ EOF
     systemctl stop docker
     systemctl restart  docker
     systemctl enable docker.service
-    echo "Docker software version: $(docker --version)"   
+    echo -e "\033[32m Docker software version: $(docker --version) \033[0m" 
+}
+
+function install_docker_compose(){
+    curl -L https://github.com/docker/compose/releases/download/1.27.4/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+    chmod +x /usr/local/bin/docker-compose
+    echo -e "\033[32m docker-compose software version: $(docker-compose --version) \033[0m"
 }
 
 function main(){
@@ -111,9 +117,13 @@ function main(){
     RESULT=$?
     if [ $RESULT == 100 ]; then
         install_docker
+        install_docker_compose
     elif [ $RESULT == 200 ]; then
         uninstall_docker
         install_docker
+        if [[ "$(docker-compose --version 2> /dev/null   |grep -c 'docker-compose version')" -eq 0 ]]; then
+            install_docker_compose
+        fi
     else
         echo "Unknown exception occurred, please check the program，status_cdeo:$RESULT"
     fi
