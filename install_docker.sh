@@ -6,7 +6,7 @@
 #########################################
 DOCKER_ROOT=/home/docker_data
 function check_docker_install(){
-    if [ $(docker --version 2> /dev/null   |grep 'Docker version'|wc -l) -eq 0 ]
+    if [ "$(docker --version 2> /dev/null   |grep -c 'Docker version')" -eq 0 ]
     then
         echo "Docker is not installed in the current system, and will be installed soon---"
         return 100
@@ -20,13 +20,13 @@ function uninstall_docker(){
     if [[ $(docker ps -a -q|wc -l) -eq 0 ]]; then
         echo "There is no Docker container in the current environment"
     else
-        docker stop $(docker ps -a -q)
+        docker stop "$(docker ps -a -q)"
     fi
 
     if [[ $(docker images -a -q|wc -l) -eq 0 ]]; then
         echo "There is no Docker image in the current environment"
     else
-        docker rmi $(docker iamges -a -q)
+        docker rmi "$(docker iamges -a -q)"
     fi
     systemctl stop docker
     rm -rf /etc/docker
@@ -41,7 +41,7 @@ function uninstall_docker(){
     wget https://mirrors.edge.kernel.org/pub/linux/utils/net/bridge-utils/bridge-utils-1.6.tar.xz --no-check-certificate
     tar -xvf bridge-utils-1.6.tar.xz
     rm -rf bridge-utils-1.6.tar.xz
-    cd bridge-utils-1.6
+    cd bridge-utils-1.6 || exit 
     autoconf
     ./configure
     make
@@ -52,7 +52,7 @@ function uninstall_docker(){
 
     ifconfig docker0 down
     brctl delbr docker0
-    if [[ $(df -Th|awk  '{print $7}'|grep 'docker'|wc -l) != 0 ]]; then
+    if [[ $(df -Th|awk  '{print $7}'|grep -c 'docker') != 0 ]]; then
         umount /var/run/docker/netns/default
     fi
     rm -rf /var/run/docker
@@ -115,7 +115,7 @@ function main(){
         uninstall_docker
         install_docker
     else
-        echo "Unknown exception occurred, please check the program，status_cdeo:$?"
+        echo "Unknown exception occurred, please check the program，status_cdeo:$RESULT"
     fi
 }
 main
