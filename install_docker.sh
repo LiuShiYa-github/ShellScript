@@ -1,6 +1,3 @@
-"registry-mirrors": ["https://registry.docker-cn.com","http://hub-mirror.c.163.com","https://docker.mirrors.ustc.edu.cn"]
-
-
 #!/bin/bash
 #########################################
 # File Name: install_docker.sh
@@ -69,34 +66,34 @@ function install_docker(){
     mkdir -p ${DOCKER_ROOT}
 
     cat >/etc/systemd/system/docker.service <<EOF
-    [Unit]
-    Description=Docker Application Container Engine
-    Documentation=https://docs.docker.com
-    After=network-online.target firewalld.service
-    Wants=network-online.target
-    [Service]
-    Type=notify
-    ExecStart=/usr/bin/dockerd
-    ExecReload=/bin/kill -s HUP $MAINPID
-    LimitNOFILE=infinity
-    LimitNPROC=infinity
-    TimeoutStartSec=0
-    Delegate=yes
-    KillMode=process
-    Restart=on-failure
-    StartLimitBurst=3
-    StartLimitInterval=60s
-    [Install]
-    WantedBy=multi-user.target
+[Unit]
+Description=Docker Application Container Engine
+Documentation=https://docs.docker.com
+After=network-online.target firewalld.service
+Wants=network-online.target
+[Service]
+Type=notify
+ExecStart=/usr/bin/dockerd
+ExecReload=/bin/kill -s HUP $MAINPID
+LimitNOFILE=infinity
+LimitNPROC=infinity
+TimeoutStartSec=0
+Delegate=yes
+KillMode=process
+Restart=on-failure
+StartLimitBurst=3
+StartLimitInterval=60s
+[Install]
+WantedBy=multi-user.target
 EOF
     mkdir /etc/docker/
     cat >/etc/docker/daemon.json<< EOF
-    {
-        "data-root": "${DOCKER_ROOT}",
-        "log-driver": "json-file",
-        "log-opts": {"max-size": "500m", "max-file": "3"}
-        "registry-mirrors": ["https://yo3sdl2l.mirror.aliyuncs.com","https://registry.docker-cn.com","http://hub-mirror.c.163.com","https://docker.mirrors.ustc.edu.cn"]
-    }
+{
+    "data-root": "${DOCKER_ROOT}",
+    "log-driver": "json-file",
+    "log-opts": {"max-size": "500m", "max-file": "3"},
+    "registry-mirrors": ["https://yo3sdl2l.mirror.aliyuncs.com","https://registry.docker-cn.com","http://hub-mirror.c.163.com","https://docker.mirrors.ustc.edu.cn"]
+}
 EOF
     chmod +x /etc/systemd/system/docker.service
     systemctl daemon-reload
