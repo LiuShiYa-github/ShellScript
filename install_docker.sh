@@ -21,6 +21,7 @@ function uninstall_docker(){
         echo "There is no Docker container in the current environment"
     else
         docker stop "$(docker ps -a -q)"
+        docker rm "$(docker ps -a -q)"
     fi
 
     if [[ $(docker images -a -q|wc -l) -eq 0 ]]; then
