@@ -26,7 +26,7 @@ function uninstall_docker(){
     if [[ $(docker images -a -q|wc -l) -eq 0 ]]; then
         echo "There is no Docker image in the current environment"
     else
-        docker rmi "$(docker iamges -a -q)"
+        docker rmi "$(docker images -a -q)"
     fi
     systemctl stop docker
     rm -rf /etc/docker
