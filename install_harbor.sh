@@ -3,6 +3,7 @@
 # File Name: install_harbor.sh
 # Version: v1.0
 # Author:shiya.liu
+# Note: Please modify script variables for multiple external network cards $network_name
 #########################################
 network_name=$(ls /etc/sysconfig/network-scripts/ifcfg-*|grep -v lo|awk -F '/etc/sysconfig/network-scripts/ifcfg-' '{print $2}')
 network_ip=$(ifconfig "$network_name" | awk 'NR==2{print $2}')
