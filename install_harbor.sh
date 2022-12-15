@@ -4,6 +4,7 @@
 # Version: v1.0
 # Author:shiya.liu
 # Note: Please modify script variables for multiple external network cards $network_name
+# Official website: https://goharbor.io/docs/2.6.0/
 #########################################
 network_name=$(ls /etc/sysconfig/network-scripts/ifcfg-*|grep -v lo|awk -F '/etc/sysconfig/network-scripts/ifcfg-' '{print $2}')
 network_ip=$(ifconfig "$network_name" | awk 'NR==2{print $2}')
@@ -37,7 +38,8 @@ function get_offline_packge() {
 function make_cert() {
     mkdir -p ./data/cert
     openssl genrsa -out ./data/cert/server.key 2048
-    echo -e "\n\n\n\n\n\n\n\n\n"|openssl req -new -key ./data/cert/server.key -out ./data/cert/server.csr
+    #echo -e "\n\n\n\n\n\n\n\n\n"|openssl req -new -key ./data/cert/server.key -out ./data/cert/server.csr
+    openssl req -new -subj "/C=CN/ST=Beijing/L=Beijing/O=example/OU=Personal/CN=yourdomain.com" -key ./data/cert/server.key -out ./data/cert/server.csr
     cp ./data/cert/server.key ./data/cert/server.key.org
     openssl x509 -req -days 365 -in ./data/cert/server.csr -signkey ./data/cert/server.key -out ./data/cert/server.crt
     chmod a+x ./data/cert/*
@@ -48,7 +50,7 @@ function change_config() {
     sed -i "s#hostname: reg.mydomain.com#hostname: $network_ip#g" harbor/harbor.yml
     sed -i "s#certificate: /your/certificate/path#certificate: $(pwd)/data/cert/server.crt#g" harbor/harbor.yml
     sed -i "s#private_key: /your/private/key/path#private_key: $(pwd)/data/cert/server.key#g" harbor/harbor.yml
-    ./harbor/install.sh
+    ./harbor/install.sh --with-notary --with-trivy --with-chartmuseum
 }
 
 function output_info() {
